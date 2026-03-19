@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: my_api
+  profiles: # 기본 프로파일 설정
+    default: dev # application-dev.yml을 읽겠다. prod, staging -> application-prod.yml
