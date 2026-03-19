@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -25,7 +27,12 @@ public class MemberController {
             throw new RuntimeException("email or password is null");
         }
 
-        Long memberId = memberService.signUp(dto.email(), dto.password());
+        Long memberId = null;
+        try {
+            memberId = memberService.signUp(dto.email(), dto.password());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return memberId;
     }

@@ -12,14 +12,16 @@ import org.springframework.stereotype.Component;
 public class LogAspect {
 
     @Around("execution(* com.example.my_api_server.service..*(..))")
-    public Object logging(ProceedingJoinPoint joinPoint) {
+    public Object logging(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
 
         try {
             return joinPoint.proceed();
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        } finally {
+        }
+//        catch (Throwable e) {
+//            throw e;
+//        }
+        finally {
             long endTime = System.currentTimeMillis();
             log.info(joinPoint.getSignature() + " 실행 시간: " + (endTime - startTime) + "ms");
         }

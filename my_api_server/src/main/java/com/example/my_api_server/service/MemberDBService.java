@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+
 @Service
 @RequiredArgsConstructor // 생성자 주입 DI
 @Slf4j
@@ -15,7 +17,7 @@ public class MemberDBService {
     private final MemberDBRepo memberDBRepo;
 
     @Transactional
-    public Long signUp(String email, String password) {
+    public Long signUp(String email, String password) throws IOException {
         Member member = Member.builder()
                 .email(email)
                 .password(password)
@@ -23,9 +25,11 @@ public class MemberDBService {
 
         Member savedMember = memberDBRepo.save(member);
 
-        sendNotification();
+        throw new IOException("외부 API 호출하다가 I/O 예외 터졌다고 가정");
+//        throw new RuntimeException("DB 예외 터졌다고 가정"); // rollback
+//        sendNotification();
 
-        return savedMember.getId();
+//        return savedMember.getId();
     }
 
 
