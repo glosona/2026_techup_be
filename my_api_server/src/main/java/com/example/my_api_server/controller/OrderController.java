@@ -8,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-
-// 반복적으로 사용하는 문법이나 코드들 = 보일러 플레이트
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -18,15 +16,21 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    // 주문 생성
     @PostMapping
     public OrderResponseDto createOrder(@Validated @RequestBody OrderCreateDto dto) {
         return orderService.createOrder(dto);
     }
 
+    // 주문 조회
     @GetMapping("/{id}")
     public OrderResponseDto findOrder(@PathVariable Long id) {
         return orderService.findOrder(id);
     }
 
-    
+    // 주문 상태 변경
+    @PatchMapping("/{id}/complete")
+    public OrderResponseDto completeOrder(@PathVariable Long id) {
+        return orderService.completeOrder(id);
+    }
 }

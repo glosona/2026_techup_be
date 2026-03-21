@@ -51,4 +51,8 @@ public class MemberDBService {
     public void changeAllUserData() {
         List<Member> members = memberDBRepo.findAll();
     }
+
+    public Member findMember(Long id) {
+        return memberDBRepo.findById(id).orElseThrow();
+    }
 }

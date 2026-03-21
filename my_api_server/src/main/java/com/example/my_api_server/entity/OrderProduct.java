@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "order_product")
+@Table(name = "order_products")
 @Getter
 @Builder
 public class OrderProduct {

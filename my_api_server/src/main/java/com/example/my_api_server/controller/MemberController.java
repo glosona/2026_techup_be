@@ -1,14 +1,12 @@
 package com.example.my_api_server.controller;
 
 import ch.qos.logback.core.util.StringUtil;
+import com.example.my_api_server.entity.Member;
 import com.example.my_api_server.service.MemberDBService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -20,7 +18,7 @@ public class MemberController {
 
     private final MemberDBService memberService;
 
-    // 회원가입
+    // 회원 가입
     @PostMapping
     public Long signUp(@Validated @RequestBody MemberSignUpDto dto) {
         if (StringUtil.isNullOrEmpty(dto.email()) || StringUtil.isNullOrEmpty(dto.password())) {
@@ -37,10 +35,10 @@ public class MemberController {
         return memberId;
     }
 
-    // 회원조회
-//    @GetMapping("/{id}")
-//    public Member findMember(@PathVariable Long id) {
-//        Member member = memberService.findMember(id);
-//        return member;
-//    }
+    // 회원 조회
+    @GetMapping("/{id}")
+    public Member findMember(@PathVariable Long id) {
+        Member member = memberService.findMember(id);
+        return member;
+    }
 }
