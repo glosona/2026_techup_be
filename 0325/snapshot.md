@@ -106,7 +106,7 @@ SELECT 쿼리 발생 시 탐색 흐름:
 1. 인덱스 → ctid로 튜플 위치 찾아감
 2. 각 튜플마다:
    - xmin의 CLOG/infomask 확인
-     → aborted  → 체인 종료, 반환 없음
+     → aborted  → 다음 체인으로
      → in-progress → 안 보임, 다음 체인으로
      → committed → xmax 확인 (MVCC visible 판별)
        → visible   → ✅ 반환
