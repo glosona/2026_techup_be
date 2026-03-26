@@ -8,13 +8,12 @@
 logging:
   level:
     root: INFO
-
-#    org.springframework.transaction: DEBUG #spring 트랜잭션 매니저 로그
-#    org.springframework.orm.jpa.JpaTransactionManager: DEBUG #JPA 연동 트랜잭션 매니저 클래스의 로그
-#    org.springframework.orm.jpa: DEBUG #트랜잭션의 시작과 끝 (영속성 컨텍스트 생명주기)
-#    org.hibernate.SQL: DEBUG #하이버네이트의 실행 과정 (쿼리 생성 및 실행)
-#    #    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-#    com.zaxxer.hikari: DEBUG #HikariCP의 커넥션 대여/반납 (리소스 흐름)
+    org.springframework.transaction: DEBUG #spring 트랜잭션 매니저 로그
+    org.springframework.orm.jpa.JpaTransactionManager: DEBUG #JPA 연동 트랜잭션 매니저 클래스의 로그
+    org.springframework.orm.jpa: DEBUG #트랜잭션의 시작과 끝 (영속성 컨텍스트 생명주기)
+    org.hibernate.SQL: DEBUG #하이버네이트의 실행 과정 (쿼리 생성 및 실행)
+    #    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.zaxxer.hikari: DEBUG #HikariCP의 커넥션 대여/반납 (리소스 흐름)
 
 decorator:
   datasource:
