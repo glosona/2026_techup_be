@@ -41,4 +41,9 @@ public class MemberController {
         Member member = memberService.findMember(id);
         return member;
     }
+
+    @GetMapping("/test")
+    public void test() {
+        memberService.tx1();
+    }
 }
