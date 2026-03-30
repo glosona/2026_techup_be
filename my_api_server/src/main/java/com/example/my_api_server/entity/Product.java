@@ -31,6 +31,9 @@ public class Product { // 상품
 
     private Long stock; // 재고
 
+    @Version
+    private Long version;
+
     // 필요한 것만 바꾸게
     public void changeProductName(String changeProductName) {
         this.productName = changeProductName;

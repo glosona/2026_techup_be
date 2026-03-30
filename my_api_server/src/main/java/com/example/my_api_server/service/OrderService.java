@@ -8,7 +8,10 @@ import com.example.my_api_server.service.dto.OrderCreateDto;
 import com.example.my_api_server.service.dto.OrderResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -94,6 +97,91 @@ public class OrderService {
         // save() 한 후에는 영속화 진행 (자식으로서 관리를 하겠다.)
 
         // Entity -> Dto로 변환
+        OrderResponseDto orderResponseDto = OrderResponseDto.of(
+                savedOrder.getOrderTime(),
+                OrderStatus.COMPLETED,
+                true);
+
+        return orderResponseDto;
+    }
+
+    // 비관적 락 사용 예시
+    @Transactional
+    public OrderResponseDto createOrderPLock(OrderCreateDto dto) {
+        Member member = memberDBRepo.findById(dto.memberId()).orElseThrow();
+        LocalDateTime orderTime = LocalDateTime.now();
+        Order order = Order.builder()
+                .buyer(member)
+                .orderStatus(OrderStatus.PENDING)
+                .orderTime(orderTime)
+                .build();
+
+        List<Product> products = productRepo.findAllByIdsWithXLock(dto.productId()); // FOR NO UPDATE LOCK(배타락)
+
+        List<OrderProduct> orderProducts = IntStream.range(0, dto.count().size())
+                .mapToObj(idx -> {
+                    Product product = products.get(idx);
+
+                    if (product.getStock() - dto.count().get(idx) < 0) {
+                        throw new RuntimeException("재고가 음수이니 주문 할 수 없습니다!");
+                    }
+
+                    product.decreaseStock(dto.count().get(idx));
+
+                    return OrderProduct.builder()
+                            .order(order)
+                            .number(dto.count().get(idx))
+                            .product(products.get(idx))
+                            .build();
+                })
+                .toList();
+
+        order.addOrderProducts(orderProducts);
+        Order savedOrder = orderRepo.save(order);
+
+        OrderResponseDto orderResponseDto = OrderResponseDto.of(
+                savedOrder.getOrderTime(),
+                OrderStatus.COMPLETED,
+                true);
+
+        return orderResponseDto;
+    }
+
+    // 낙관적 락 사용 예시
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Retryable(includes = ObjectOptimisticLockingFailureException.class, maxRetries = 3)
+    public OrderResponseDto createOrderOptLock(OrderCreateDto dto) {
+        log.info("@Retryable 테스트");
+        Member member = memberDBRepo.findById(dto.memberId()).orElseThrow();
+        LocalDateTime orderTime = LocalDateTime.now();
+        Order order = Order.builder()
+                .buyer(member)
+                .orderStatus(OrderStatus.PENDING)
+                .orderTime(orderTime)
+                .build();
+
+        List<Product> products = productRepo.findAllById(dto.productId());
+
+        List<OrderProduct> orderProducts = IntStream.range(0, dto.count().size())
+                .mapToObj(idx -> {
+                    Product product = products.get(idx);
+
+                    if (product.getStock() - dto.count().get(idx) < 0) {
+                        throw new RuntimeException("재고가 음수이니 주문 할 수 없습니다!");
+                    }
+
+                    product.decreaseStock(dto.count().get(idx));
+
+                    return OrderProduct.builder()
+                            .order(order)
+                            .number(dto.count().get(idx))
+                            .product(products.get(idx))
+                            .build();
+                })
+                .toList();
+
+        order.addOrderProducts(orderProducts);
+        Order savedOrder = orderRepo.save(order);
         OrderResponseDto orderResponseDto = OrderResponseDto.of(
                 savedOrder.getOrderTime(),
                 OrderStatus.COMPLETED,
