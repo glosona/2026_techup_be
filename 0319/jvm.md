@@ -93,7 +93,8 @@ Thread Private:
 └── Native Method Stack: 네이티브 메서드 Frame
 ```
 
-**Method Area — Thread Shared**
+#### 1. **Method Area — Thread Shared**
+
 
 모든 스레드 공유, JVM 시작 시 생성. 저장 데이터:
 - 클래스 메타정보 (클래스/인터페이스/필드/메서드/생성자 Bytecode 정보)
@@ -103,7 +104,9 @@ Thread Private:
 
 OS 메모리 초과 방지를 위해 **Metaspace** 영역으로 동적 확장.
 
-**Heap — Thread Shared**
+<br>
+
+#### 2. **Heap — Thread Shared**
 
 모든 스레드 공유, JVM 시작 시 생성. `new`로 생성되는 모든 객체·배열 저장. GC 대상.
 
@@ -111,18 +114,24 @@ GC 효율을 위해 세대 구분:
 - Young Generation: 새 객체. 수명 짧은 객체 빠르게 GC
 - Old Generation: Young에서 오래 살아남은 객체
 
-**Stack — Thread Private**
+<br>
+
+#### 3. **Stack — Thread Private**
 
 스레드마다 독립 생성. 메서드 호출마다 **스택 프레임(Stack Frame)** push, 완료 시 pop. LIFO.
 - 프레임 내용: 지역 변수, 매개변수, 리턴 주소
 
 `StackOverflowError` 발생 가능 → 재귀 탈출 조건 주의
 
-**PC Register — Thread Private**
+<br>
+
+#### 4. **PC Register — Thread Private**
 
 스레드마다 하나. 현재 실행 중인 명령어 주소 저장.
 
-**Native Method Stack**
+<br>
+
+#### 5. **Native Method Stack**
 
 JNI로 호출된 네이티브 메서드(C/C++)의 스택 프레임 저장.
 
