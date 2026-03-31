@@ -4,11 +4,11 @@
 
 - commit 동작 로그(정상 작동 혹은 CheckedException 발생)
 
-![transaction_commit.png](./transaction_commit.png)
+![transaction_commit.png](./transaction/transaction_commit.png)
 
 - rollback 동작 로그(RuntimeException 발생)
 
-![transaction_rollback.png](./transaction_rollback.png)
+![transaction_rollback.png](./transaction/transaction_rollback.png)
 
 ### b) IOException 발생 시에도 Rollback이 됐던 이유
 
@@ -54,7 +54,7 @@ public Object logging(ProceedingJoinPoint joinPoint) throws Throwable {
 
 **원인: JPA 1차 캐시 (Persistence Context)**
 
-![jpa_cache.png](./jpa_cache.png)
+![jpa_cache.png](./transaction/jpa_cache.png)
 
 같은 클래스 내 `@Transactional` 메서드 호출은 **Self-invocation** 문제로 AOP 프록시를 거치지 않아 트랜잭션이 적용되지 않는다.
 
@@ -68,4 +68,4 @@ o.s.orm.jpa.JpaTransactionManager        : Participating in existing transaction
 
 별도 클래스로 분리하여 AOP 프록시를 통해 호출해야 실제 DB 데이터만 반환되고, 트랜잭션도 의도대로 동작한다.
 
-![db_sync.png](./db_sync.png)
+![db_sync.png](./transaction/db_sync.png)
