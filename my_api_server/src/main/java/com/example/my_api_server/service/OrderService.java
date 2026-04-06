@@ -109,7 +109,13 @@ public class OrderService {
     @Transactional
     public OrderResponseDto createOrderPLock(OrderCreateDto dto) {
         Member member = memberDBRepo.findById(dto.memberId()).orElseThrow();
-        LocalDateTime orderTime = LocalDateTime.now();
+        LocalDateTime orderTime = LocalDateTime.now(); //2026-04-03T12:16:19.363524
+
+        if (orderTime.getHour() == 13) {
+            // 로직 실행(점심시간 이벤트 쿠폰 발행)
+            return null;
+        }
+
         Order order = Order.builder()
                 .buyer(member)
                 .orderStatus(OrderStatus.PENDING)
