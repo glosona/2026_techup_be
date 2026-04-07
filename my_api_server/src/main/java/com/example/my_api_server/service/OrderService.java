@@ -73,8 +73,6 @@ public class OrderService {
 
                     product.buyProductWithStock(orderCount);
 
-                    product.decreaseStock(orderCount);
-
                     return order.createOrderProduct(orderCount, product);
                 })
                 .toList();

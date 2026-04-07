@@ -51,7 +51,7 @@ public class Product { // 상품
 
     public void buyProductWithStock(Long orderCount) {
         if (this.getStock() - orderCount < 0) {
-            throw new RuntimeException("재고가 음수이니 주문 할 수 없습니다.");
+            throw new RuntimeException("재고가 음수이니 주문 할 수 없습니다!");
         }
         this.decreaseStock(orderCount);
 
