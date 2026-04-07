@@ -1,0 +1,47 @@
+# ======================================================
+# Test 환경 설정 (application-test.yml)
+# ======================================================
+
+
+logging:
+  level:
+    root: INFO
+    #    org.springframework.transaction: DEBUG #spring 트랜잭션 매니저 로그
+    #    org.springframework.orm.jpa.JpaTransactionManager: DEBUG #JPA 연동 트랜잭션 매니저 클래스의 로그
+    #    org.springframework.orm.jpa: DEBUG #트랜잭션의 시작과 끝 (영속성 컨텍스트 생명주기)
+    #    org.hibernate.SQL: DEBUG #하이버네이트의 실행 과정 (쿼리 생성 및 실행)
+    #    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#    com.zaxxer.hikari: DEBUG #HikariCP의 커넥션 대여/반납 (리소스 흐름)
+
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+      multiline: true
+      logging: slf4j
+      tracing:
+        include-parameter-values: true
+
+testcontainers:
+  postgres:
+    image: postgres:18-alpine  # 프로덕션 DB 버전과 맞추는 게 유일한 관심사
+
+
+spring:
+  config:
+    activate:
+      on-profile: test # 내이름은 xxx이다.(파일 이름 명시)
+
+  #  datasource: #DB 접속정보 관리
+  #    driver-class-name: org.postgresql.Driver
+  #    url: jdbc:postgresql://localhost:5433/my_api
+  #    username: postgres
+  #    password: 1234
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false

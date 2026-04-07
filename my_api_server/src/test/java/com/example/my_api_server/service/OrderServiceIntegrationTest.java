@@ -2,6 +2,7 @@ package com.example.my_api_server.service;
 
 import com.example.my_api_server.common.MemberFixture;
 import com.example.my_api_server.common.ProductFixture;
+import com.example.my_api_server.config.TestContainerConfig;
 import com.example.my_api_server.entity.Member;
 import com.example.my_api_server.entity.Product;
 import com.example.my_api_server.repo.MemberDBRepo;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -25,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 @SpringBootTest // Spring DI를 통해(Bean) 주입 해주는 어노테이션
+@Import(TestContainerConfig.class)
 @ActiveProfiles("test") // application-test.yml 값을 읽는다.
 public class OrderServiceIntegrationTest {
 
@@ -98,9 +101,9 @@ public class OrderServiceIntegrationTest {
         @DisplayName("주문 생성 시 재고가 정상적으로 차감된다.")
         public void createOrderStockDecreaseSuccess() {
             //given
-            List<Long> counts = List.of(1L, 1L);
-            Member savedMember = getSavedMember("1234");
-            List<Product> products = getProducts();
+            List<Long> counts = List.of(1L, 1L); //주문량(상품1(1), 상품2(1))
+            Member savedMember = getSavedMember("1234"); //멤버 저장
+            List<Product> products = getProducts(); //상품 저장(DB에 값이 반영되기 전)
             List<Long> productIds = getProductIds(products); //productId 추출 작업
 
             OrderCreateDto createDto = new OrderCreateDto(savedMember.getId(), productIds, counts);
@@ -113,9 +116,9 @@ public class OrderServiceIntegrationTest {
 
             // 현재 재고(product 생성 시점) - 요청 주문 재고(요청량) = 최신재고(결과값이 반영된 재고)
             for (int i = 0; i < products.size(); i++) {
-                Product beforeProduct = products.get(i); // 이전 상품 정보(재고)
-                Product nowProduct = resultProducts.get(i); // 최신 상품 정보(재고)
-                Long orderStock = counts.get(i); // 주문 재고
+                Product beforeProduct = products.get(i); //이전 상품 정보(재고)
+                Product nowProduct = resultProducts.get(i); //최신 상품 정보(재고)
+                Long orderStock = counts.get(i); //주문 수량(각 상품마다 다르겟죠)
                 assertThat(beforeProduct.getStock() - orderStock).isEqualTo(nowProduct.getStock());
             }
         }
@@ -136,7 +139,7 @@ public class OrderServiceIntegrationTest {
             //then
             assertThatThrownBy(() -> orderService.createOrder(createDto))
                     .isInstanceOf(RuntimeException.class)
-                    .hasMessage("재고가 음수이니 주문 할 수 없습니다.");
+                    .hasMessage("재고가 음수이니 주문 할 수 없습니다!");
         }
 
         // 주문 생성 시 상품 개수를 조회한다 과제

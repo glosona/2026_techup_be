@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.0.3'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 group = 'com.example'
@@ -38,8 +39,33 @@ dependencies {
 
     // DB
     runtimeOnly 'org.postgresql:postgresql'
+
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Spring Boot Testcontainers 통합 스타터
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+
+// Testcontainers 2.x - BOM으로 버전 통합 관리
+    testImplementation platform('org.testcontainers:testcontainers-bom:2.0.4')
+
+// 2.x 아티팩트명: testcontainers- 접두사 필수
+    testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+    testImplementation 'org.testcontainers:testcontainers-postgresql'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy tasks.jacocoTestReport
 }
+
+//자코코 설정
+jacocoTestReport {
+    dependsOn tasks.test
+    reports {
+        xml.required = false
+        html.required = true
+        csv.required = false
+    }
+}
+
+

@@ -19,7 +19,7 @@ public class OrderController {
     // 주문 생성
     @PostMapping
     public OrderResponseDto createOrder(@Validated @RequestBody OrderCreateDto dto) {
-        return orderService.createOrderOptLock(dto);
+        return orderService.createOrderPLock(dto);
     }
 
     // 주문 조회
