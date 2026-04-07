@@ -40,6 +40,24 @@ public class Order {
     // 주문(1) : 주문상품(N) 바지,신발,모자...  1:N 관계를 나타내야 한다.
     // 주문(1) <-> 주문상품들(N) <-> 상품(1)
 
+    //정적 팩토리 패턴
+    public static Order createOrder(Member member, LocalDateTime orderTime) {
+        return Order.builder()
+                .buyer(member)
+                .orderStatus(OrderStatus.PENDING)
+                .orderTime(orderTime)
+                .build();
+    }
+
+    // 루트 엔티티(에그리거트 루트) 내부 응집도 상승
+    public OrderProduct createOrderProduct(Long orderCount, Product product) {
+        return OrderProduct.builder()
+                .order(this)
+                .number(orderCount) // 주문개수 매핑
+                .product(product)
+                .build();
+    }
+
     // 양방향 매핑
     public void addOrderProducts(List<OrderProduct> orderProducts) {
         this.orderProducts = orderProducts;
@@ -49,4 +67,5 @@ public class Order {
         this.orderStatus = orderStatus;
         return OrderResponseDto.of(orderTime, orderStatus, true);
     }
+
 }

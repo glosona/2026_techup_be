@@ -31,16 +31,9 @@ public class OrderService {
     @Transactional
     public OrderResponseDto createOrder(OrderCreateDto dto) {
 
-        Member member = memberDBRepo.findById(dto.memberId()).orElseThrow();
-
-        LocalDateTime orderTime = LocalDateTime.now();
-
-        // TODO: 리팩토링
-        Order order = Order.builder()
-                .buyer(member)
-                .orderStatus(OrderStatus.PENDING)
-                .orderTime(orderTime)
-                .build();
+        Member member = memberDBRepo.findById(dto.memberId())
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+//      기본값:  throw new NoSuchElementException("No value present");
 
         /**
          * 1. OrderProduct에 저장
@@ -68,41 +61,38 @@ public class OrderService {
 //                        .product(p)
 //                        .build()
 //                ).toList();
+
+        Order order = Order.createOrder(member, dto.orderTime());
         List<Product> products = productRepo.findAllById(dto.productId()); // IN 쿼리
 
         List<OrderProduct> orderProducts = IntStream.range(0, dto.count().size())
                 .mapToObj(idx -> {
                     // 재고 차감
                     Product product = products.get(idx);
+                    Long orderCount = dto.count().get(idx);
 
-                    if (product.getStock() - dto.count().get(idx) < 0) {         // 음수 예외 처리
-                        throw new RuntimeException("재고가 음수이니 주문 할 수 없습니다!");
-                    }
+                    product.buyProductWithStock(orderCount);
 
-                    product.decreaseStock(dto.count().get(idx));
+                    product.decreaseStock(orderCount);
 
-                    return OrderProduct.builder()
-                            .order(order)
-                            .number(dto.count().get(idx)) // 주문개수 매핑
-                            .product(products.get(idx))
-                            .build();
+                    return order.createOrderProduct(orderCount, product);
                 })
                 .toList();
 
         order.addOrderProducts(orderProducts);
+
         // save()를 하기 전에는 영속화 x
         // - 영속화를 통해서 업데이트를 쉽게 할 수 있는 더티체크 가능
         // - DB에서 계속 조회하지 않고, 내부에서 빠르게 조회할 수 있는 캐시 매커니즘
+
         Order savedOrder = orderRepo.save(order);
         // save() 한 후에는 영속화 진행 (자식으로서 관리를 하겠다.)
 
         // Entity -> Dto로 변환
-        OrderResponseDto orderResponseDto = OrderResponseDto.of(
+        return OrderResponseDto.of(
                 savedOrder.getOrderTime(),
                 OrderStatus.COMPLETED,
                 true);
-
-        return orderResponseDto;
     }
 
     // 비관적 락 사용 예시

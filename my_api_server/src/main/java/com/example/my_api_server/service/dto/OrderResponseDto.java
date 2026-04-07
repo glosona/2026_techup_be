@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 public class OrderResponseDto {
 
-    private LocalDateTime orderCompleteTime; // 주문 완료 시간
+    private LocalDateTime orderCompletedTime; // 주문 완료 시간
 
     private OrderStatus orderStatus; // 주문 상태
 
