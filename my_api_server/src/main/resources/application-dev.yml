@@ -24,6 +24,35 @@ decorator:
       tracing:
         include-parameter-values: true
 
+
+# 모니터링 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  # 모든 엔드포인트 노출 (개발용)
+      base-path: /actuator
+
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      metrics:
+        export:
+          enabled: true
+      enabled: true
+
+  metrics:
+    enable:
+      jvm: true
+      system: true
+      tomcat: true
+      process: true
+      hikaricp: true
+      jdbc: true
+    tags:
+      application: ${spring.application.name}
+
 spring:
   config:
     activate:

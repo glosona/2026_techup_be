@@ -12,5 +12,63 @@ services:
     volumes:
       - postgres_volume:/var/lib/postgresql
 
+  influxdb:
+    image: influxdb:1.8
+    container_name: local-influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=k6
+      - INFLUXDB_ADMIN_ENABLED=true
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+      - INFLUXDB_HTTP_MAX_BODY_SIZE=0
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: local-prometheus
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: postgres_exporter
+    restart: unless-stopped
+    environment:
+      # 포맷: postgresql://사용자:비밀번호@서비스명:포트/DB명?sslmode=disable
+      DATA_SOURCE_NAME: "postgresql://postgres:1234@my_api_postgres:5432/my_api?sslmode=disable"
+    ports:
+      - "9187:9187"
+    depends_on:
+      - postgres
+
+  grafana:
+    image: grafana/grafana
+    container_name: local-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - influxdb
+      - prometheus
+
+
 volumes:
   postgres_volume:
+  influxdb-data:
+  grafana-data:
+  prometheus-data:
