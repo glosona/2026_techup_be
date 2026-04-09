@@ -14,3 +14,4 @@ KT Cloud Tech Up 백엔드 2기
 - [0326(목) - Tomcat, JPA 메커니즘](./0326/0326.md)
 - [0327(금) - Spring Transaction 심화, 모듈화](./0327/0327.md)
 - [0330(월) - Java 동시성 관리](./0330/0330.md)
+- [0409(목) - CI/CD 배포(GitHub Actions & AWS ECR)](./0409/0409.md)
