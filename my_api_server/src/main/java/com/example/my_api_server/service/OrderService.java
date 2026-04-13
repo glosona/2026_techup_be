@@ -62,7 +62,7 @@ public class OrderService {
 //                        .build()
 //                ).toList();
 
-        Order order = Order.createOrder(member, dto.orderTime());
+        Order order = Order.createOrder(member);
         List<Product> products = productRepo.findAllById(dto.productId()); // IN 쿼리
 
         List<OrderProduct> orderProducts = IntStream.range(0, dto.count().size())
@@ -100,7 +100,7 @@ public class OrderService {
         Member member = memberDBRepo.findById(dto.memberId())
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
-        Order order = Order.createOrder(member, dto.orderTime());
+        Order order = Order.createOrder(member);
         List<Product> products = productRepo.findAllByIdsWithXLock(dto.productId()); // FOR NO UPDATE LOCK(배타락)
 
         List<OrderProduct> orderProducts = IntStream.range(0, dto.count().size())

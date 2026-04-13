@@ -41,11 +41,15 @@ public class Order {
     // 주문(1) <-> 주문상품들(N) <-> 상품(1)
 
     //정적 팩토리 패턴
-    public static Order createOrder(Member member, LocalDateTime orderTime) {
+    public static Order createOrder(Member member) {
+        // Order가 생성될 때 LocalDateTime.now()를 주입시키는 방향으로 리팩토링을 했습니다.
+        // orderTime을 활용한 로직은 return받은 Order 객체에서 불러와 사용할 수 있습니다.
+        // : LocalDateTime orderTime = order.getOrderTime();
+
         return Order.builder()
                 .buyer(member)
                 .orderStatus(OrderStatus.PENDING)
-                .orderTime(orderTime)
+                .orderTime(LocalDateTime.now())
                 .build();
     }
 
@@ -67,5 +71,4 @@ public class Order {
         this.orderStatus = orderStatus;
         return OrderResponseDto.of(orderTime, orderStatus, true);
     }
-
 }
