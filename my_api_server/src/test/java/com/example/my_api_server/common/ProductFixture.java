@@ -31,5 +31,13 @@ public class ProductFixture {
 
         return List.of(product1, product2);
     }
+
+    public static Product.ProductBuilder defaultProductWithId(int id) {
+        return Product.builder()
+                .productNumber("TEST" + id)
+                .productName("shirts" + id)
+                .productType(ProductType.CLOTHES)
+                .price(1000L);
+    }
 }
 

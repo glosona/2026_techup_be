@@ -11,4 +11,9 @@ public class MemberFixture {
         return Member.builder()
                 .email("test1@gmail.com");
     }
+
+    public static Member.MemberBuilder defaultMemberWithPassword() {
+        return Member.builder()
+                .password("1234");
+    }
 }
