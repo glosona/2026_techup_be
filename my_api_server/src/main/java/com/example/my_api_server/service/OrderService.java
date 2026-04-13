@@ -96,49 +96,32 @@ public class OrderService {
     // 비관적 락 사용 예시
     @Transactional
     public OrderResponseDto createOrderPLock(OrderCreateDto dto) {
-        Member member = memberDBRepo.findById(dto.memberId()).orElseThrow();
-        LocalDateTime orderTime = LocalDateTime.now(); //2026-04-03T12:16:19.363524
 
-        if (orderTime.getHour() == 13) {
-            // 로직 실행(점심시간 이벤트 쿠폰 발행)
-            return null;
-        }
+        Member member = memberDBRepo.findById(dto.memberId())
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
-        Order order = Order.builder()
-                .buyer(member)
-                .orderStatus(OrderStatus.PENDING)
-                .orderTime(orderTime)
-                .build();
-
+        Order order = Order.createOrder(member, dto.orderTime());
         List<Product> products = productRepo.findAllByIdsWithXLock(dto.productId()); // FOR NO UPDATE LOCK(배타락)
 
         List<OrderProduct> orderProducts = IntStream.range(0, dto.count().size())
                 .mapToObj(idx -> {
+                    // 재고 차감
                     Product product = products.get(idx);
+                    Long orderCount = dto.count().get(idx);
 
-                    if (product.getStock() - dto.count().get(idx) < 0) {
-                        throw new RuntimeException("재고가 음수이니 주문 할 수 없습니다!");
-                    }
+                    product.buyProductWithStock(orderCount);
 
-                    product.decreaseStock(dto.count().get(idx));
-
-                    return OrderProduct.builder()
-                            .order(order)
-                            .number(dto.count().get(idx))
-                            .product(products.get(idx))
-                            .build();
+                    return order.createOrderProduct(orderCount, product);
                 })
                 .toList();
 
         order.addOrderProducts(orderProducts);
         Order savedOrder = orderRepo.save(order);
 
-        OrderResponseDto orderResponseDto = OrderResponseDto.of(
+        return OrderResponseDto.of(
                 savedOrder.getOrderTime(),
                 OrderStatus.COMPLETED,
                 true);
-
-        return orderResponseDto;
     }
 
     // 낙관적 락 사용 예시
